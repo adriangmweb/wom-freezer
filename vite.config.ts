@@ -8,12 +8,12 @@ export default defineConfig({
     svelte(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg'],
+      includeAssets: ['favicon-32x32.png', 'favicon-16x16.png', 'apple-touch-icon.png'],
       manifest: {
-        name: 'Freezer Inventory',
+        name: 'Freezer',
         short_name: 'Freezer',
         description: 'Track your freezer inventory',
-        theme_color: '#2563eb',
+        theme_color: '#06b6d4',
         background_color: '#f9fafb',
         display: 'standalone',
         orientation: 'portrait',
