@@ -9,15 +9,17 @@
   import EditItemModal from '$lib/components/modals/EditItemModal.svelte'
   import SearchInput from '$lib/components/shared/SearchInput.svelte'
   import FilterChips from '$lib/components/shared/FilterChips.svelte'
+  import SortSelector, { type SortOption } from '$lib/components/shared/SortSelector.svelte'
 
   let showAddModal = $state(false)
   let editingItem = $state<FreezerItem | null>(null)
   let loading = $state(true)
 
-  // Search and filter state
+  // Search, filter, and sort state
   let searchQuery = $state('')
   let selectedCategory = $state<string | null>(null)
   let selectedStatus = $state<'all' | 'expiring' | 'expired'>('all')
+  let sortBy = $state<SortOption>('added')
 
   onMount(async () => {
     await Promise.all([loadItems(), loadCategories()])
@@ -28,7 +30,7 @@
   const expiringCount = $derived($expiringItems.length)
   const expiredCount = $derived($expiredItems.length)
 
-  // Filtered items
+  // Filtered and sorted items
   const filteredItems = $derived.by(() => {
     let result = $items
 
@@ -52,6 +54,24 @@
     } else if (selectedStatus === 'expired') {
       result = result.filter(item => getExpirationStatus(item.expirationDate) === 'expired')
     }
+
+    // Sort items
+    result = [...result].sort((a, b) => {
+      switch (sortBy) {
+        case 'name':
+          return a.name.localeCompare(b.name)
+        case 'added':
+          return new Date(b.addedDate).getTime() - new Date(a.addedDate).getTime()
+        case 'expiration':
+          // Items without expiration go to the end
+          if (!a.expirationDate && !b.expirationDate) return 0
+          if (!a.expirationDate) return 1
+          if (!b.expirationDate) return -1
+          return new Date(a.expirationDate).getTime() - new Date(b.expirationDate).getTime()
+        default:
+          return 0
+      }
+    })
 
     return result
   })
@@ -93,8 +113,12 @@
     </div>
   </div>
 
-  <!-- Filter Chips -->
+  <!-- Filter Chips and Sort -->
   <div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-2">
+    <div class="flex items-center justify-between gap-2 mb-2">
+      <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Filter & Sort</span>
+      <SortSelector value={sortBy} onChange={(v) => sortBy = v} />
+    </div>
     <FilterChips
       categories={$categories}
       {selectedCategory}
@@ -118,7 +142,7 @@
       items={filteredItems}
       categories={$categories}
       onEdit={handleEdit}
-      groupByCategory={!searchQuery && !selectedCategory && selectedStatus === 'all'}
+      groupByCategory={!searchQuery && !selectedCategory && selectedStatus === 'all' && sortBy === 'added'}
     />
   {/if}
 
