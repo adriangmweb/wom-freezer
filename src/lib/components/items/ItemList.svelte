@@ -46,17 +46,17 @@
 {#if items.length === 0}
   <div class="text-center py-12 px-4">
     <div class="text-6xl mb-4">🧊</div>
-    <h3 class="text-lg font-medium text-gray-900 mb-2">Your freezer is empty</h3>
-    <p class="text-gray-500">Tap the + button to add your first item</p>
+    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Your freezer is empty</h3>
+    <p class="text-gray-500 dark:text-gray-400">Tap the + button to add your first item</p>
   </div>
 {:else if groupByCategory && groupedItems}
   <div class="space-y-6">
     {#each groupedItems as group}
       <div>
-        <div class="flex items-center gap-2 px-4 py-2 bg-gray-100">
+        <div class="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800">
           <span class="text-lg">{group.category.icon}</span>
-          <h2 class="font-semibold text-gray-700">{group.category.name}</h2>
-          <span class="text-sm text-gray-500">({group.items.length})</span>
+          <h2 class="font-semibold text-gray-700 dark:text-gray-200">{group.category.name}</h2>
+          <span class="text-sm text-gray-500 dark:text-gray-400">({group.items.length})</span>
         </div>
         <div class="px-4 py-2 space-y-2">
           {#each group.items as item (item.id)}

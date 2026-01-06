@@ -63,11 +63,11 @@
 
 {#if loading}
   <div class="flex items-center justify-center h-64">
-    <div class="text-gray-500">Loading...</div>
+    <div class="text-gray-500 dark:text-gray-400">Loading...</div>
   </div>
 {:else}
   <!-- Search -->
-  <div class="bg-white border-b border-gray-200 px-4 py-3">
+  <div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
     <SearchInput
       value={searchQuery}
       onInput={(v) => searchQuery = v}
@@ -76,25 +76,25 @@
   </div>
 
   <!-- Stats Bar -->
-  <div class="bg-white border-b border-gray-200 px-4 py-3">
+  <div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
     <div class="flex justify-around text-center">
       <div>
-        <div class="text-2xl font-bold text-gray-900">{totalItems}</div>
-        <div class="text-xs text-gray-500">Total Items</div>
+        <div class="text-2xl font-bold text-gray-900 dark:text-white">{totalItems}</div>
+        <div class="text-xs text-gray-500 dark:text-gray-400">Total Items</div>
       </div>
       <div>
         <div class="text-2xl font-bold text-orange-500">{expiringCount}</div>
-        <div class="text-xs text-gray-500">Expiring Soon</div>
+        <div class="text-xs text-gray-500 dark:text-gray-400">Expiring Soon</div>
       </div>
       <div>
         <div class="text-2xl font-bold text-red-500">{expiredCount}</div>
-        <div class="text-xs text-gray-500">Expired</div>
+        <div class="text-xs text-gray-500 dark:text-gray-400">Expired</div>
       </div>
     </div>
   </div>
 
   <!-- Filter Chips -->
-  <div class="bg-white border-b border-gray-200 px-4 py-2">
+  <div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-2">
     <FilterChips
       categories={$categories}
       {selectedCategory}
@@ -110,8 +110,8 @@
   {#if filteredItems.length === 0 && (searchQuery || selectedCategory || selectedStatus !== 'all')}
     <div class="text-center py-12 px-4">
       <div class="text-4xl mb-4">🔍</div>
-      <h3 class="text-lg font-medium text-gray-900 mb-2">No items found</h3>
-      <p class="text-gray-500">Try adjusting your search or filters</p>
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No items found</h3>
+      <p class="text-gray-500 dark:text-gray-400">Try adjusting your search or filters</p>
     </div>
   {:else}
     <ItemList

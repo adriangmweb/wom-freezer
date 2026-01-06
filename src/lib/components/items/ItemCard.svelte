@@ -13,14 +13,14 @@
 
 <button
   onclick={() => onEdit(item)}
-  class="w-full bg-white rounded-lg shadow-sm border border-gray-100 p-4 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left"
+  class="w-full bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-4 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left"
 >
   <div class="text-2xl">{category?.icon ?? '📦'}</div>
 
   <div class="flex-1 min-w-0">
     <div class="flex items-center gap-2">
-      <h3 class="font-medium text-gray-900 truncate">{item.name}</h3>
-      <span class="text-sm text-gray-500">x{item.quantity}</span>
+      <h3 class="font-medium text-gray-900 dark:text-white truncate">{item.name}</h3>
+      <span class="text-sm text-gray-500 dark:text-gray-400">x{item.quantity}</span>
     </div>
     <ExpirationBadge date={item.expirationDate} />
   </div>
