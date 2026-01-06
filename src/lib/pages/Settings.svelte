@@ -1,13 +1,17 @@
 <script lang="ts">
   import { db } from '$lib/db/database'
-  import { items } from '$lib/stores/items'
+  import { items, loadItems } from '$lib/stores/items'
+  import { categories, loadCategories } from '$lib/stores/categories'
   import { theme, setTheme, type Theme } from '$lib/stores/theme'
+  import { showToast } from '$lib/stores/ui'
 
   const themeOptions: { id: Theme; label: string; icon: string }[] = [
     { id: 'light', label: 'Light', icon: '☀️' },
     { id: 'dark', label: 'Dark', icon: '🌙' },
     { id: 'system', label: 'System', icon: '💻' },
   ]
+
+  let fileInput: HTMLInputElement
 
   async function handleExport() {
     const data = {
@@ -23,12 +27,87 @@
     a.download = `freezer-backup-${new Date().toISOString().split('T')[0]}.json`
     a.click()
     URL.revokeObjectURL(url)
+    showToast('Data exported successfully')
+  }
+
+  async function handleImport(event: Event) {
+    const input = event.target as HTMLInputElement
+    const file = input.files?.[0]
+    if (!file) return
+
+    try {
+      const text = await file.text()
+      const data = JSON.parse(text)
+
+      if (!data.items || !Array.isArray(data.items)) {
+        throw new Error('Invalid backup file: missing items array')
+      }
+
+      const mergeMode = confirm(
+        'Do you want to merge with existing data?\n\nOK = Merge (keep existing + add new)\nCancel = Replace (delete existing)'
+      )
+
+      if (!mergeMode) {
+        await db.items.clear()
+        if (data.categories) {
+          await db.categories.clear()
+        }
+      }
+
+      // Import items
+      for (const item of data.items) {
+        // Convert date strings back to Date objects
+        if (item.expirationDate) {
+          item.expirationDate = new Date(item.expirationDate)
+        }
+        if (item.addedDate) {
+          item.addedDate = new Date(item.addedDate)
+        }
+
+        if (mergeMode) {
+          // Check if item already exists
+          const existing = await db.items.get(item.id)
+          if (!existing) {
+            await db.items.add(item)
+          }
+        } else {
+          await db.items.add(item)
+        }
+      }
+
+      // Import custom categories if present
+      if (data.categories && Array.isArray(data.categories)) {
+        for (const category of data.categories) {
+          if (mergeMode) {
+            const existing = await db.categories.get(category.id)
+            if (!existing) {
+              await db.categories.add(category)
+            }
+          } else {
+            await db.categories.put(category)
+          }
+        }
+      }
+
+      // Reload stores
+      await loadItems()
+      await loadCategories()
+
+      showToast(`Imported ${data.items.length} items successfully`)
+    } catch (error) {
+      console.error('Import error:', error)
+      showToast('Failed to import: Invalid file format')
+    }
+
+    // Reset file input
+    input.value = ''
   }
 
   async function handleClearAll() {
     if (confirm('Are you sure you want to delete all items? This cannot be undone.')) {
       await db.items.clear()
       items.set([])
+      showToast('All items deleted')
     }
   }
 </script>
@@ -71,6 +150,26 @@
       <div>
         <div class="font-medium text-gray-900 dark:text-white">Export Data</div>
         <div class="text-sm text-gray-500 dark:text-gray-400">Download your freezer inventory as JSON</div>
+      </div>
+    </button>
+
+    <input
+      type="file"
+      accept=".json"
+      onchange={handleImport}
+      bind:this={fileInput}
+      class="hidden"
+    />
+    <button
+      onclick={() => fileInput.click()}
+      class="w-full px-4 py-4 flex items-center gap-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+    >
+      <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m4-8l-4-4m0 0L12 8m4-4v12" />
+      </svg>
+      <div>
+        <div class="font-medium text-gray-900 dark:text-white">Import Data</div>
+        <div class="text-sm text-gray-500 dark:text-gray-400">Restore from a backup JSON file</div>
       </div>
     </button>
 
