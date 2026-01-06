@@ -29,6 +29,17 @@
     }
   })
 
+  $effect(() => {
+    if (!item) return
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+    }
+  })
+
   async function handleSave() {
     if (!item || !name.trim()) return
 
@@ -67,7 +78,7 @@
     class="fixed inset-0 bg-black/50 z-50 flex items-end justify-center"
     onclick={handleBackdropClick}
   >
-    <div class="bg-white w-full max-w-lg rounded-t-2xl p-6 max-h-[90vh] overflow-y-auto animate-slide-up">
+    <div class="bg-white w-full max-w-lg rounded-t-2xl p-6 max-h-[90vh] overflow-y-auto overscroll-contain touch-pan-y animate-slide-up modal-scroll">
       <div class="flex items-center justify-between mb-6">
         <h2 class="text-xl font-semibold">Edit Item</h2>
         <button
@@ -186,5 +197,9 @@
 
   .animate-slide-up {
     animation: slide-up 0.3s ease-out;
+  }
+
+  .modal-scroll {
+    -webkit-overflow-scrolling: touch;
   }
 </style>
