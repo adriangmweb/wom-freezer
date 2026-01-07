@@ -3,7 +3,7 @@
   import type { FreezerItem } from '$lib/types'
   import { items, loadItems, expiringItems, expiredItems, deleteItem } from '$lib/stores/items'
   import { showToast } from '$lib/stores/ui'
-  import { modal } from '$lib/stores/modal'
+  import { modal } from '$lib/stores/modal.svelte'
   import { categories, loadCategories } from '$lib/stores/categories'
   import { getExpirationStatus } from '$lib/utils/expiration'
   import ItemList from '$lib/components/items/ItemList.svelte'

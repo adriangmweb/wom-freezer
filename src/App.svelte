@@ -7,7 +7,7 @@
   import QuickAddModal from '$lib/components/modals/QuickAddModal.svelte'
   import EditItemModal from '$lib/components/modals/EditItemModal.svelte'
   import CategoryModal from '$lib/components/modals/CategoryModal.svelte'
-  import { modal } from '$lib/stores/modal'
+  import { modal } from '$lib/stores/modal.svelte'
   import { categories } from '$lib/stores/categories'
 
   let currentPage: 'home' | 'categories' | 'settings' = $state('home')

@@ -3,7 +3,7 @@
   import type { Category } from '$lib/types'
   import { categories, loadCategories } from '$lib/stores/categories'
   import { items, loadItems } from '$lib/stores/items'
-  import { modal } from '$lib/stores/modal'
+  import { modal } from '$lib/stores/modal.svelte'
 
   let loading = $state(true)
 
