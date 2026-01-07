@@ -6,10 +6,10 @@
   let { title = 'Freezer' }: Props = $props()
 </script>
 
-<header class="sticky top-0 z-10 bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-4 py-3 shadow-lg">
-  <div class="flex items-center justify-center gap-2">
-    <svg class="w-8 h-8" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <g stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+<header class="sticky top-0 z-10 bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-4 pt-safe pb-3 shadow-lg">
+  <div class="flex items-center justify-center gap-2 pt-3">
+    <svg class="w-7 h-7" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <g stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
         <line x1="60" y1="20" x2="60" y2="100" />
         <line x1="20" y1="60" x2="100" y2="60" />
         <line x1="32" y1="32" x2="88" y2="88" />
