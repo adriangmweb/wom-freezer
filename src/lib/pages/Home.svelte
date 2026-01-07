@@ -169,7 +169,7 @@
   <!-- FAB -->
   <button
     onclick={() => showAddModal = true}
-    class="fixed right-4 bottom-24 w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-500 text-white rounded-2xl shadow-lg shadow-cyan-500/30 flex items-center justify-center hover:shadow-xl hover:shadow-cyan-500/40 active:scale-95 transition-all duration-200"
+    class="fixed right-4 bottom-safe w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-500 text-white rounded-2xl shadow-lg shadow-cyan-500/30 flex items-center justify-center hover:shadow-xl hover:shadow-cyan-500/40 active:scale-95 transition-all duration-200"
     aria-label="Add item"
   >
     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">

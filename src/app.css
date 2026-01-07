@@ -38,6 +38,14 @@ html, body {
   padding-right: env(safe-area-inset-right);
 }
 
+.mb-safe {
+  margin-bottom: env(safe-area-inset-bottom);
+}
+
+.bottom-safe {
+  bottom: calc(5rem + env(safe-area-inset-bottom));
+}
+
 /* Smooth scrolling */
 * {
   -webkit-overflow-scrolling: touch;

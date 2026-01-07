@@ -16,7 +16,7 @@
 <div class="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
   <Header {title} />
 
-  <main class="flex-1 overflow-y-auto pb-20">
+  <main class="flex-1 overflow-y-auto pb-24 mb-safe">
     {@render children()}
   </main>
 
