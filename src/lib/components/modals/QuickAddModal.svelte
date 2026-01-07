@@ -67,10 +67,10 @@
 {#if open}
   <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
   <div
-    class="fixed inset-0 bg-black/50 z-50 flex items-end justify-center"
+    class="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4"
     onclick={handleBackdropClick}
   >
-    <div class="bg-white dark:bg-gray-800 w-full max-w-lg rounded-t-2xl p-6 pb-safe max-h-[85vh] overflow-y-auto animate-slide-up">
+    <div class="bg-white dark:bg-gray-800 w-full max-w-lg rounded-2xl p-6 max-h-[80vh] overflow-y-auto shadow-2xl animate-fade-in">
       <div class="flex items-center justify-between mb-6">
         <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Add Item</h2>
         <button
@@ -175,16 +175,18 @@
 {/if}
 
 <style>
-  @keyframes slide-up {
+  @keyframes fade-in {
     from {
-      transform: translateY(100%);
+      opacity: 0;
+      transform: scale(0.95);
     }
     to {
-      transform: translateY(0);
+      opacity: 1;
+      transform: scale(1);
     }
   }
 
-  .animate-slide-up {
-    animation: slide-up 0.3s ease-out;
+  .animate-fade-in {
+    animation: fade-in 0.2s ease-out;
   }
 </style>
