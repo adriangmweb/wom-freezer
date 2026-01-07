@@ -3,11 +3,9 @@
   import type { Category } from '$lib/types'
   import { categories, loadCategories } from '$lib/stores/categories'
   import { items, loadItems } from '$lib/stores/items'
-  import CategoryModal from '$lib/components/modals/CategoryModal.svelte'
+  import { modal } from '$lib/stores/modal'
 
   let loading = $state(true)
-  let showModal = $state(false)
-  let editingCategory = $state<Category | null>(null)
 
   onMount(async () => {
     await Promise.all([loadCategories(), loadItems()])
@@ -19,18 +17,11 @@
   }
 
   function handleAdd() {
-    editingCategory = null
-    showModal = true
+    modal.openCategory(null)
   }
 
   function handleEdit(category: Category) {
-    editingCategory = category
-    showModal = true
-  }
-
-  function handleClose() {
-    showModal = false
-    editingCategory = null
+    modal.openCategory(category)
   }
 </script>
 
@@ -82,7 +73,4 @@
     </div>
   </div>
 
-  {#if showModal}
-    <CategoryModal category={editingCategory} onClose={handleClose} />
-  {/if}
 {/if}

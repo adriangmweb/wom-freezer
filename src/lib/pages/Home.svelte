@@ -3,17 +3,14 @@
   import type { FreezerItem } from '$lib/types'
   import { items, loadItems, expiringItems, expiredItems, deleteItem } from '$lib/stores/items'
   import { showToast } from '$lib/stores/ui'
+  import { modal } from '$lib/stores/modal'
   import { categories, loadCategories } from '$lib/stores/categories'
   import { getExpirationStatus } from '$lib/utils/expiration'
   import ItemList from '$lib/components/items/ItemList.svelte'
-  import QuickAddModal from '$lib/components/modals/QuickAddModal.svelte'
-  import EditItemModal from '$lib/components/modals/EditItemModal.svelte'
   import SearchInput from '$lib/components/shared/SearchInput.svelte'
   import FilterChips from '$lib/components/shared/FilterChips.svelte'
   import SortSelector, { type SortOption } from '$lib/components/shared/SortSelector.svelte'
 
-  let showAddModal = $state(false)
-  let editingItem = $state<FreezerItem | null>(null)
   let loading = $state(true)
 
   // Search, filter, and sort state
@@ -78,7 +75,7 @@
   })
 
   function handleEdit(item: FreezerItem) {
-    editingItem = item
+    modal.openEditItem(item)
   }
 
   async function handleDelete(item: FreezerItem) {
@@ -168,7 +165,7 @@
 
   <!-- FAB -->
   <button
-    onclick={() => showAddModal = true}
+    onclick={() => modal.openQuickAdd()}
     class="fixed right-4 bottom-safe w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-500 text-white rounded-2xl shadow-lg shadow-cyan-500/30 flex items-center justify-center hover:shadow-xl hover:shadow-cyan-500/40 active:scale-95 transition-all duration-200"
     aria-label="Add item"
   >
@@ -177,17 +174,4 @@
     </svg>
   </button>
 
-  <!-- Add Modal -->
-  <QuickAddModal
-    open={showAddModal}
-    categories={$categories}
-    onClose={() => showAddModal = false}
-  />
-
-  <!-- Edit Modal -->
-  <EditItemModal
-    item={editingItem}
-    categories={$categories}
-    onClose={() => editingItem = null}
-  />
 {/if}

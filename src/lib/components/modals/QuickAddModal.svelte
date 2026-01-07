@@ -67,7 +67,7 @@
 {#if open}
   <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
   <div
-    class="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4"
+    class="fixed inset-0 bg-black/50 z-[9999] flex items-center justify-center p-4"
     onclick={handleBackdropClick}
   >
     <div class="bg-white dark:bg-gray-800 w-full max-w-lg rounded-2xl p-6 max-h-[80vh] overflow-y-auto shadow-2xl animate-fade-in">

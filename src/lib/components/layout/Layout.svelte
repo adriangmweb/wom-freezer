@@ -13,10 +13,10 @@
   let { title, activePage, onNavigate, children }: Props = $props()
 </script>
 
-<div class="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
   <Header {title} />
 
-  <main class="flex-1 overflow-y-auto pb-24 mb-safe">
+  <main class="pb-32">
     {@render children()}
   </main>
 
