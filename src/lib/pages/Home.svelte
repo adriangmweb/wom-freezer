@@ -1,7 +1,8 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import type { FreezerItem } from '$lib/types'
-  import { items, loadItems, expiringItems, expiredItems } from '$lib/stores/items'
+  import { items, loadItems, expiringItems, expiredItems, deleteItem } from '$lib/stores/items'
+  import { showToast } from '$lib/stores/ui'
   import { categories, loadCategories } from '$lib/stores/categories'
   import { getExpirationStatus } from '$lib/utils/expiration'
   import ItemList from '$lib/components/items/ItemList.svelte'
@@ -79,6 +80,13 @@
   function handleEdit(item: FreezerItem) {
     editingItem = item
   }
+
+  async function handleDelete(item: FreezerItem) {
+    if (confirm(`Delete "${item.name}"?`)) {
+      await deleteItem(item.id)
+      showToast(`Deleted "${item.name}"`)
+    }
+  }
 </script>
 
 {#if loading}
@@ -153,6 +161,7 @@
       items={filteredItems}
       categories={$categories}
       onEdit={handleEdit}
+      onDelete={handleDelete}
       groupByCategory={!searchQuery && !selectedCategory && selectedStatus === 'all' && sortBy === 'added'}
     />
   {/if}
