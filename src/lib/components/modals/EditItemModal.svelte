@@ -64,10 +64,13 @@
 {#if item}
   <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
   <div
-    class="fixed inset-0 bg-black/50 z-[9999] flex items-center justify-center p-4"
+    class="fixed inset-0 bg-black/50 z-[9999] flex items-center justify-center p-4 touch-none"
     onclick={handleBackdropClick}
   >
-    <div class="bg-white dark:bg-gray-800 w-full max-w-lg rounded-2xl p-6 max-h-[80vh] overflow-y-auto shadow-2xl animate-fade-in">
+    <div
+      class="bg-white dark:bg-gray-800 w-full max-w-lg rounded-2xl p-6 max-h-[80vh] overflow-y-auto shadow-2xl animate-fade-in overscroll-contain touch-auto"
+      onclick={(e) => e.stopPropagation()}
+    >
       <div class="flex items-center justify-between mb-6">
         <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Edit Item</h2>
         <button
