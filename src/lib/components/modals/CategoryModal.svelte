@@ -85,7 +85,7 @@
   class="fixed inset-0 bg-black/50 z-50 flex items-end justify-center"
   onclick={handleBackdropClick}
 >
-  <div class="bg-white dark:bg-gray-800 w-full max-w-lg rounded-t-2xl p-6 animate-slide-up">
+  <div class="bg-white dark:bg-gray-800 w-full max-w-lg rounded-t-2xl p-6 pb-safe max-h-[85vh] overflow-y-auto animate-slide-up">
     <div class="flex items-center justify-between mb-6">
       <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
         {isEditing ? 'Edit Category' : 'Add Category'}
@@ -170,12 +170,12 @@
       </div>
 
       <!-- Actions -->
-      <div class="flex gap-3 pt-2">
+      <div class="flex gap-3 pt-2 pb-4">
         {#if isEditing && category && !category.isDefault}
           <button
             type="button"
             onclick={handleDelete}
-            class="py-3 px-4 border border-red-500 text-red-500 rounded-lg font-medium hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+            class="py-3 px-4 border border-red-500 text-red-500 rounded-xl font-medium hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
           >
             Delete
           </button>

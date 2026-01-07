@@ -70,7 +70,7 @@
     class="fixed inset-0 bg-black/50 z-50 flex items-end justify-center"
     onclick={handleBackdropClick}
   >
-    <div class="bg-white dark:bg-gray-800 w-full max-w-lg rounded-t-2xl p-6 animate-slide-up">
+    <div class="bg-white dark:bg-gray-800 w-full max-w-lg rounded-t-2xl p-6 pb-safe max-h-[85vh] overflow-y-auto animate-slide-up">
       <div class="flex items-center justify-between mb-6">
         <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Add Item</h2>
         <button
@@ -152,19 +152,19 @@
         </div>
 
         <!-- Actions -->
-        <div class="flex gap-3 pt-2">
+        <div class="flex gap-3 pt-2 pb-4">
           <button
             type="button"
             onclick={() => handleSubmit(true)}
             disabled={!name.trim()}
-            class="flex-1 py-3 px-4 border border-blue-500 text-blue-500 rounded-lg font-medium hover:bg-blue-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            class="flex-1 py-3 px-4 border border-cyan-500 text-cyan-600 dark:text-cyan-400 rounded-xl font-medium hover:bg-cyan-50 dark:hover:bg-cyan-900/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Add & Continue
           </button>
           <button
             type="submit"
             disabled={!name.trim()}
-            class="flex-1 py-3 px-4 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            class="flex-1 py-3 px-4 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl font-medium hover:from-cyan-600 hover:to-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Add Item
           </button>

@@ -67,12 +67,12 @@
     class="fixed inset-0 bg-black/50 z-50 flex items-end justify-center"
     onclick={handleBackdropClick}
   >
-    <div class="bg-white w-full max-w-lg rounded-t-2xl p-6 max-h-[90vh] overflow-y-auto animate-slide-up">
+    <div class="bg-white dark:bg-gray-800 w-full max-w-lg rounded-t-2xl p-6 pb-safe max-h-[85vh] overflow-y-auto animate-slide-up">
       <div class="flex items-center justify-between mb-6">
-        <h2 class="text-xl font-semibold">Edit Item</h2>
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Edit Item</h2>
         <button
           onclick={onClose}
-          class="p-2 hover:bg-gray-100 rounded-full transition-colors"
+          class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors text-gray-500 dark:text-gray-400"
           aria-label="Close"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -84,18 +84,18 @@
       <form onsubmit={(e) => { e.preventDefault(); handleSave(); }} class="space-y-5">
         <!-- Name -->
         <div>
-          <label for="edit-name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+          <label for="edit-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
           <input
             id="edit-name"
             type="text"
             bind:value={name}
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none"
           />
         </div>
 
         <!-- Category -->
         <div>
-          <span class="block text-sm font-medium text-gray-700 mb-2">Category</span>
+          <span class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category</span>
           <CategoryPicker
             {categories}
             selected={selectedCategory}
@@ -105,20 +105,20 @@
 
         <!-- Quantity -->
         <div>
-          <span class="block text-sm font-medium text-gray-700 mb-2">Quantity</span>
+          <span class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Quantity</span>
           <div class="flex items-center gap-4">
             <button
               type="button"
               onclick={() => quantity = Math.max(1, quantity - 1)}
-              class="w-12 h-12 flex items-center justify-center bg-gray-100 rounded-full text-xl font-medium hover:bg-gray-200 transition-colors"
+              class="w-12 h-12 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-full text-xl font-medium hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white transition-colors"
             >
               -
             </button>
-            <span class="text-2xl font-semibold w-12 text-center">{quantity}</span>
+            <span class="text-2xl font-semibold w-12 text-center text-gray-900 dark:text-white">{quantity}</span>
             <button
               type="button"
               onclick={() => quantity++}
-              class="w-12 h-12 flex items-center justify-center bg-gray-100 rounded-full text-xl font-medium hover:bg-gray-200 transition-colors"
+              class="w-12 h-12 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-full text-xl font-medium hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white transition-colors"
             >
               +
             </button>
@@ -127,44 +127,44 @@
 
         <!-- Expiration Date -->
         <div>
-          <label for="edit-expiration" class="block text-sm font-medium text-gray-700 mb-1">
+          <label for="edit-expiration" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Expiration Date
           </label>
           <input
             id="edit-expiration"
             type="date"
             bind:value={expirationDate}
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none"
           />
         </div>
 
         <!-- Notes -->
         <div>
-          <label for="edit-notes" class="block text-sm font-medium text-gray-700 mb-1">
+          <label for="edit-notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Notes (optional)
           </label>
           <textarea
             id="edit-notes"
             bind:value={notes}
             rows="2"
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none resize-none"
             placeholder="Any additional notes..."
           ></textarea>
         </div>
 
         <!-- Actions -->
-        <div class="flex gap-3 pt-2">
+        <div class="flex gap-3 pt-2 pb-4">
           <button
             type="button"
             onclick={handleDelete}
-            class="py-3 px-4 border border-red-500 text-red-500 rounded-lg font-medium hover:bg-red-50 transition-colors"
+            class="py-3 px-4 border border-red-500 text-red-500 rounded-xl font-medium hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
           >
             Delete
           </button>
           <button
             type="submit"
             disabled={!name.trim()}
-            class="flex-1 py-3 px-4 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            class="flex-1 py-3 px-4 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl font-medium hover:from-cyan-600 hover:to-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Save Changes
           </button>
