@@ -9,9 +9,10 @@
     groupByCategory?: boolean
     onEdit: (item: FreezerItem) => void
     onDelete?: (item: FreezerItem) => void
+    onQuantityChange?: (item: FreezerItem, delta: number) => void
   }
 
-  let { items, categories, groupByCategory = true, onEdit, onDelete }: Props = $props()
+  let { items, categories, groupByCategory = true, onEdit, onDelete, onQuantityChange }: Props = $props()
 
   interface GroupedItems {
     category: Category
@@ -61,7 +62,7 @@
         </div>
         <div class="px-4 py-2 space-y-2">
           {#each group.items as item (item.id)}
-            <ItemCard {item} category={group.category} {onEdit} {onDelete} />
+            <ItemCard {item} category={group.category} {onEdit} {onDelete} {onQuantityChange} />
           {/each}
         </div>
       </div>
@@ -70,7 +71,7 @@
 {:else}
   <div class="px-4 py-2 space-y-2">
     {#each items as item (item.id)}
-      <ItemCard {item} category={getCategoryById(categories, item.categoryId)} {onEdit} {onDelete} />
+      <ItemCard {item} category={getCategoryById(categories, item.categoryId)} {onEdit} {onDelete} {onQuantityChange} />
     {/each}
   </div>
 {/if}

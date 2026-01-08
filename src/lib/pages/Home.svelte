@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import type { FreezerItem } from '$lib/types'
-  import { items, loadItems, expiringItems, expiredItems, deleteItem } from '$lib/stores/items'
+  import { items, loadItems, expiringItems, expiredItems, deleteItem, updateItem } from '$lib/stores/items'
   import { showToast } from '$lib/stores/ui'
   import { modal } from '$lib/stores/modal.svelte'
   import { categories, loadCategories } from '$lib/stores/categories'
@@ -84,6 +84,11 @@
       showToast(`Deleted "${item.name}"`)
     }
   }
+
+  async function handleQuantityChange(item: FreezerItem, delta: number) {
+    const newQuantity = Math.max(1, item.quantity + delta)
+    await updateItem(item.id, { quantity: newQuantity })
+  }
 </script>
 
 {#if loading}
@@ -159,6 +164,7 @@
       categories={$categories}
       onEdit={handleEdit}
       onDelete={handleDelete}
+      onQuantityChange={handleQuantityChange}
       groupByCategory={!searchQuery && !selectedCategory && selectedStatus === 'all' && sortBy === 'added'}
     />
   {/if}
