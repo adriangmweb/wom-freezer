@@ -42,9 +42,9 @@
     if (swipeOffset < -SWIPE_THRESHOLD && onDelete) {
       // Swiped left - delete
       onDelete(item)
-    } else if (swipeOffset > SWIPE_THRESHOLD) {
-      // Swiped right - edit
-      onEdit(item)
+    } else if (swipeOffset > SWIPE_THRESHOLD && onQuantityChange) {
+      // Swiped right - use one (decrement quantity)
+      onQuantityChange(item, -1)
     }
     // Reset
     swipeOffset = 0
@@ -68,14 +68,17 @@
     </svg>
   </div>
 
-  <!-- Edit action (right swipe) -->
+  <!-- Use one action (right swipe) -->
   <div
-    class="absolute inset-y-0 left-0 w-24 bg-cyan-500 flex items-center justify-center transition-opacity duration-200"
+    class="absolute inset-y-0 left-0 w-24 bg-green-500 flex items-center justify-center transition-opacity duration-200"
     style="opacity: {swipeOffset > 20 ? Math.min(1, swipeOffset / SWIPE_THRESHOLD) : 0}"
   >
-    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-    </svg>
+    <div class="flex flex-col items-center text-white">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+      </svg>
+      <span class="text-xs font-medium mt-1">Use 1</span>
+    </div>
   </div>
 
   <!-- svelte-ignore a11y_no_static_element_interactions -->
