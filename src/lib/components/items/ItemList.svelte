@@ -14,6 +14,19 @@
 
   let { items, categories, groupByCategory = true, onEdit, onDelete, onQuantityChange }: Props = $props()
 
+  // Track collapsed categories
+  let collapsedCategories = $state<Set<string>>(new Set())
+
+  function toggleCategory(categoryId: string) {
+    if (collapsedCategories.has(categoryId)) {
+      collapsedCategories.delete(categoryId)
+    } else {
+      collapsedCategories.add(categoryId)
+    }
+    // Trigger reactivity
+    collapsedCategories = new Set(collapsedCategories)
+  }
+
   interface GroupedItems {
     category: Category
     items: FreezerItem[]
@@ -52,19 +65,33 @@
     <p class="text-gray-500 dark:text-gray-400">Tap the + button to add your first item</p>
   </div>
 {:else if groupByCategory && groupedItems}
-  <div class="space-y-6">
+  <div class="space-y-2">
     {#each groupedItems as group}
+      {@const isCollapsed = collapsedCategories.has(group.category.id)}
       <div>
-        <div class="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800">
+        <button
+          onclick={() => toggleCategory(group.category.id)}
+          class="w-full flex items-center gap-2 px-4 py-3 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+        >
+          <svg
+            class="w-4 h-4 text-gray-400 transition-transform duration-200 {isCollapsed ? '-rotate-90' : ''}"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
           <span class="text-lg">{group.category.icon}</span>
           <h2 class="font-semibold text-gray-700 dark:text-gray-200">{group.category.name}</h2>
           <span class="text-sm text-gray-500 dark:text-gray-400">({group.items.length})</span>
-        </div>
-        <div class="px-4 py-2 space-y-2">
-          {#each group.items as item (item.id)}
-            <ItemCard {item} category={group.category} {onEdit} {onDelete} {onQuantityChange} />
-          {/each}
-        </div>
+        </button>
+        {#if !isCollapsed}
+          <div class="px-4 py-2 space-y-2">
+            {#each group.items as item (item.id)}
+              <ItemCard {item} category={group.category} {onEdit} {onDelete} {onQuantityChange} />
+            {/each}
+          </div>
+        {/if}
       </div>
     {/each}
   </div>
