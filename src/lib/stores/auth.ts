@@ -36,10 +36,18 @@ export async function signInWithApple() {
 
 export async function signInWithEmail(email: string) {
   if (!supabase) throw new Error('Supabase not configured')
-  const emailRedirectTo = `${window.location.origin}/auth/callback`
   const { error } = await supabase.auth.signInWithOtp({
+    email
+  })
+  if (error) throw error
+}
+
+export async function verifyEmailOtp(email: string, token: string) {
+  if (!supabase) throw new Error('Supabase not configured')
+  const { error } = await supabase.auth.verifyOtp({
     email,
-    options: { emailRedirectTo }
+    token,
+    type: 'email'
   })
   if (error) throw error
 }

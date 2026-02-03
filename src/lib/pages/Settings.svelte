@@ -4,7 +4,7 @@
   import { categories, loadCategories } from '$lib/stores/categories'
   import { theme, setTheme, type Theme } from '$lib/stores/theme'
   import { showToast } from '$lib/stores/ui'
-  import { session, user, signInWithApple, signInWithEmail, signOut } from '$lib/stores/auth'
+  import { session, user, signInWithApple, signInWithEmail, verifyEmailOtp, signOut } from '$lib/stores/auth'
   import { syncState, syncOnce } from '$lib/sync/syncEngine'
   import { isSupabaseConfigured } from '$lib/supabase/client'
 
@@ -16,6 +16,8 @@
 
   let fileInput: HTMLInputElement
   let email = ''
+  let otp = ''
+  let otpSent = false
   let authError: string | null = null
   const appleEnabled = false
 
@@ -144,9 +146,25 @@
     if (!email.trim()) return
     try {
       await signInWithEmail(email.trim())
-      showToast('Magic link sent. Check your email.')
+      otpSent = true
+      showToast('Code sent. Check your email for the 6-digit code.')
     } catch (error) {
-      authError = error instanceof Error ? error.message : 'Failed to send magic link'
+      authError = error instanceof Error ? error.message : 'Failed to send code'
+    }
+  }
+
+  async function handleVerifyOtp() {
+    authError = null
+    const trimmedEmail = email.trim()
+    const trimmedOtp = otp.trim()
+    if (!trimmedEmail || !trimmedOtp) return
+    try {
+      await verifyEmailOtp(trimmedEmail, trimmedOtp)
+      otp = ''
+      otpSent = false
+      showToast('Signed in successfully')
+    } catch (error) {
+      authError = error instanceof Error ? error.message : 'Invalid code'
     }
   }
 
@@ -288,19 +306,39 @@
           Sign in with Apple
         </button>
       {/if}
-      <div class="flex gap-2">
-        <input
-          type="email"
-          placeholder="you@example.com"
-          bind:value={email}
-          class="flex-1 px-3 py-2 rounded-lg text-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
-        />
-        <button
-          onclick={handleEmailSignIn}
-          class="py-2 px-3 rounded-lg text-sm font-medium bg-blue-500 text-white hover:bg-blue-600 transition-colors"
-        >
-          Send link
-        </button>
+      <div class="space-y-2">
+        <div class="flex gap-2">
+          <input
+            type="email"
+            placeholder="you@example.com"
+            bind:value={email}
+            class="flex-1 px-3 py-2 rounded-lg text-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+          />
+          <button
+            onclick={handleEmailSignIn}
+            class="py-2 px-3 rounded-lg text-sm font-medium bg-blue-500 text-white hover:bg-blue-600 transition-colors"
+          >
+            Send code
+          </button>
+        </div>
+
+        {#if otpSent}
+          <div class="flex gap-2">
+            <input
+              type="text"
+              inputmode="numeric"
+              placeholder="6-digit code"
+              bind:value={otp}
+              class="flex-1 px-3 py-2 rounded-lg text-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+            />
+            <button
+              onclick={handleVerifyOtp}
+              class="py-2 px-3 rounded-lg text-sm font-medium bg-blue-500 text-white hover:bg-blue-600 transition-colors"
+            >
+              Verify
+            </button>
+          </div>
+        {/if}
       </div>
     {/if}
 
