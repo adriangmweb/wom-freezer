@@ -147,7 +147,7 @@
     try {
       await signInWithEmail(email.trim())
       otpSent = true
-      showToast('Code sent. Check your email for the 6-digit code.')
+      showToast('Code sent. Check your email for the code.')
     } catch (error) {
       authError = error instanceof Error ? error.message : 'Failed to send code'
     }
@@ -327,7 +327,7 @@
             <input
               type="text"
               inputmode="numeric"
-              placeholder="6-digit code"
+              placeholder="Code"
               bind:value={otp}
               class="flex-1 px-3 py-2 rounded-lg text-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
             />
