@@ -23,6 +23,7 @@
     "vite-plugin-pwa": "^1.2.0"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.93.3",
     "date-fns": "^4.1.0",
     "dexie": "^4.0.10"
   }

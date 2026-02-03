@@ -5,7 +5,7 @@ import type { Category } from '$lib/types'
 export const categories = writable<Category[]>([])
 
 export async function loadCategories() {
-  const allCategories = await db.categories.orderBy('sortOrder').toArray()
+  const allCategories = await db.categories.orderBy('sortOrder').filter(cat => cat.deletedAt == null).toArray()
   categories.set(allCategories)
   return allCategories
 }
@@ -14,15 +14,20 @@ export function getCategoryById(cats: Category[], id: string): Category | undefi
   return cats.find(c => c.id === id)
 }
 
-export async function addCategory(category: Omit<Category, 'id' | 'sortOrder' | 'isDefault'>) {
+export async function addCategory(
+  category: Omit<Category, 'id' | 'sortOrder' | 'isDefault' | 'updatedAt' | 'deletedAt'>
+) {
   const allCategories = await db.categories.toArray()
   const maxSortOrder = Math.max(...allCategories.map(c => c.sortOrder), 0)
+  const now = new Date()
 
   const newCategory: Category = {
     ...category,
     id: crypto.randomUUID(),
     sortOrder: maxSortOrder + 1,
     isDefault: false,
+    updatedAt: now,
+    deletedAt: null,
   }
 
   await db.categories.add(newCategory)
@@ -31,7 +36,7 @@ export async function addCategory(category: Omit<Category, 'id' | 'sortOrder' | 
 }
 
 export async function updateCategory(id: string, updates: Partial<Pick<Category, 'name' | 'icon' | 'color'>>) {
-  await db.categories.update(id, updates)
+  await db.categories.update(id, { ...updates, updatedAt: new Date() })
   await loadCategories()
 }
 
@@ -45,9 +50,9 @@ export async function deleteCategory(id: string) {
   // Move items in this category to "other"
   const itemsInCategory = await db.items.where('categoryId').equals(id).toArray()
   for (const item of itemsInCategory) {
-    await db.items.update(item.id, { categoryId: 'other' })
+    await db.items.update(item.id, { categoryId: 'other', updatedAt: new Date() })
   }
 
-  await db.categories.delete(id)
+  await db.categories.update(id, { deletedAt: new Date(), updatedAt: new Date() })
   await loadCategories()
 }

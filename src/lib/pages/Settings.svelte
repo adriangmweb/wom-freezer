@@ -4,6 +4,9 @@
   import { categories, loadCategories } from '$lib/stores/categories'
   import { theme, setTheme, type Theme } from '$lib/stores/theme'
   import { showToast } from '$lib/stores/ui'
+  import { session, user, signInWithApple, signInWithEmail, signOut } from '$lib/stores/auth'
+  import { syncState, syncOnce } from '$lib/sync/syncEngine'
+  import { isSupabaseConfigured } from '$lib/supabase/client'
 
   const themeOptions: { id: Theme; label: string; icon: string }[] = [
     { id: 'light', label: 'Light', icon: '☀️' },
@@ -12,11 +15,16 @@
   ]
 
   let fileInput: HTMLInputElement
+  let email = ''
+  let authError: string | null = null
+  const appleEnabled = false
 
   async function handleExport() {
+    const items = await db.items.filter(item => item.deletedAt == null).toArray()
+    const categories = await db.categories.filter(category => category.deletedAt == null).toArray()
     const data = {
-      items: await db.items.toArray(),
-      categories: await db.categories.toArray(),
+      items,
+      categories,
       exportedAt: new Date().toISOString(),
     }
 
@@ -43,14 +51,16 @@
         throw new Error('Invalid backup file: missing items array')
       }
 
-      const mergeMode = confirm(
-        'Do you want to merge with existing data?\n\nOK = Merge (keep existing + add new)\nCancel = Replace (delete existing)'
-      )
+      const now = new Date()
+      const existingItems = await db.items.toArray()
+      for (const item of existingItems) {
+        await db.items.update(item.id, { deletedAt: now, updatedAt: now })
+      }
 
-      if (!mergeMode) {
-        await db.items.clear()
-        if (data.categories) {
-          await db.categories.clear()
+      if (data.categories) {
+        const existingCategories = await db.categories.toArray()
+        for (const category of existingCategories) {
+          await db.categories.update(category.id, { deletedAt: now, updatedAt: now })
         }
       }
 
@@ -63,29 +73,34 @@
         if (item.addedDate) {
           item.addedDate = new Date(item.addedDate)
         }
-
-        if (mergeMode) {
-          // Check if item already exists
-          const existing = await db.items.get(item.id)
-          if (!existing) {
-            await db.items.add(item)
-          }
+        if (item.updatedAt) {
+          item.updatedAt = new Date(item.updatedAt)
         } else {
-          await db.items.add(item)
+          item.updatedAt = item.addedDate ? new Date(item.addedDate) : new Date()
         }
+        if (item.deletedAt) {
+          item.deletedAt = new Date(item.deletedAt)
+        } else {
+          item.deletedAt = null
+        }
+
+        await db.items.put(item)
       }
 
       // Import custom categories if present
       if (data.categories && Array.isArray(data.categories)) {
         for (const category of data.categories) {
-          if (mergeMode) {
-            const existing = await db.categories.get(category.id)
-            if (!existing) {
-              await db.categories.add(category)
-            }
+          if (category.updatedAt) {
+            category.updatedAt = new Date(category.updatedAt)
           } else {
-            await db.categories.put(category)
+            category.updatedAt = new Date()
           }
+          if (category.deletedAt) {
+            category.deletedAt = new Date(category.deletedAt)
+          } else {
+            category.deletedAt = null
+          }
+          await db.categories.put(category)
         }
       }
 
@@ -105,9 +120,52 @@
 
   async function handleClearAll() {
     if (confirm('Are you sure you want to delete all items? This cannot be undone.')) {
-      await db.items.clear()
-      items.set([])
+      const now = new Date()
+      const allItems = await db.items.toArray()
+      for (const item of allItems) {
+        await db.items.update(item.id, { deletedAt: now, updatedAt: now })
+      }
+      await loadItems()
       showToast('All items deleted')
+    }
+  }
+
+  async function handleAppleSignIn() {
+    authError = null
+    try {
+      await signInWithApple()
+    } catch (error) {
+      authError = error instanceof Error ? error.message : 'Failed to sign in'
+    }
+  }
+
+  async function handleEmailSignIn() {
+    authError = null
+    if (!email.trim()) return
+    try {
+      await signInWithEmail(email.trim())
+      showToast('Magic link sent. Check your email.')
+    } catch (error) {
+      authError = error instanceof Error ? error.message : 'Failed to send magic link'
+    }
+  }
+
+  async function handleSignOut() {
+    authError = null
+    try {
+      await signOut()
+      showToast('Signed out')
+    } catch (error) {
+      authError = error instanceof Error ? error.message : 'Failed to sign out'
+    }
+  }
+
+  async function handleSyncNow() {
+    authError = null
+    try {
+      await syncOnce()
+    } catch (error) {
+      authError = error instanceof Error ? error.message : 'Sync failed'
     }
   }
 </script>
@@ -185,6 +243,70 @@
         <div class="text-sm text-gray-500 dark:text-gray-400">Delete all items from your freezer</div>
       </div>
     </button>
+  </div>
+
+  <!-- Sync -->
+  <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 space-y-3">
+    <div class="flex items-center gap-3">
+      <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v6h6M20 20v-6h-6M5 19a9 9 0 0014-7M19 5a9 9 0 00-14 7" />
+      </svg>
+      <span class="font-medium text-gray-900 dark:text-white">Sync</span>
+    </div>
+
+    {#if !isSupabaseConfigured}
+      <div class="text-sm text-gray-500 dark:text-gray-400">
+        Supabase is not configured. Add <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code>.
+      </div>
+    {:else if $session}
+      <div class="text-sm text-gray-600 dark:text-gray-300">
+        Signed in as {$user?.email ?? 'unknown'}
+      </div>
+      <div class="text-xs text-gray-500 dark:text-gray-400">
+        Last sync: {$syncState.lastSyncedAt ? $syncState.lastSyncedAt.toLocaleString() : 'Never'}
+      </div>
+      <div class="flex gap-2">
+        <button
+          onclick={handleSyncNow}
+          class="flex-1 py-2 px-3 rounded-lg text-sm font-medium bg-blue-500 text-white hover:bg-blue-600 transition-colors"
+        >
+          {$syncState.status === 'syncing' ? 'Syncing…' : 'Sync now'}
+        </button>
+        <button
+          onclick={handleSignOut}
+          class="flex-1 py-2 px-3 rounded-lg text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+        >
+          Sign out
+        </button>
+      </div>
+    {:else}
+      {#if appleEnabled}
+        <button
+          onclick={handleAppleSignIn}
+          class="w-full py-2 px-3 rounded-lg text-sm font-medium bg-black text-white hover:bg-gray-900 transition-colors"
+        >
+          Sign in with Apple
+        </button>
+      {/if}
+      <div class="flex gap-2">
+        <input
+          type="email"
+          placeholder="you@example.com"
+          bind:value={email}
+          class="flex-1 px-3 py-2 rounded-lg text-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+        />
+        <button
+          onclick={handleEmailSignIn}
+          class="py-2 px-3 rounded-lg text-sm font-medium bg-blue-500 text-white hover:bg-blue-600 transition-colors"
+        >
+          Send link
+        </button>
+      </div>
+    {/if}
+
+    {#if authError}
+      <div class="text-sm text-red-500">{authError}</div>
+    {/if}
   </div>
 
   <div class="text-center text-sm text-gray-400 dark:text-gray-500 pt-4">

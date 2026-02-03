@@ -19,4 +19,13 @@ export async function initializeDatabase() {
       version: '1.0.0'
     })
   }
+
+  const syncState = await db.sync.get('state')
+  if (!syncState) {
+    await db.sync.add({
+      id: 'state',
+      lastSyncedAt: new Date(0),
+      deviceId: crypto.randomUUID(),
+    })
+  }
 }

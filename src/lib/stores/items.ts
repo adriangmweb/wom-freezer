@@ -17,16 +17,21 @@ export const expiredItems = derived(items, $items =>
 )
 
 export async function loadItems() {
-  const allItems = await db.items.toArray()
+  const allItems = await db.items.filter(item => item.deletedAt == null).toArray()
   items.set(allItems)
   return allItems
 }
 
-export async function addItem(item: Omit<FreezerItem, 'id' | 'addedDate'>) {
+export async function addItem(
+  item: Omit<FreezerItem, 'id' | 'addedDate' | 'updatedAt' | 'deletedAt'>
+) {
+  const now = new Date()
   const newItem: FreezerItem = {
     ...item,
     id: crypto.randomUUID(),
-    addedDate: new Date(),
+    addedDate: now,
+    updatedAt: now,
+    deletedAt: null,
   }
   await db.items.add(newItem)
   items.update(current => [...current, newItem])
@@ -34,17 +39,18 @@ export async function addItem(item: Omit<FreezerItem, 'id' | 'addedDate'>) {
 }
 
 export async function updateItem(id: string, updates: Partial<FreezerItem>) {
-  await db.items.update(id, updates)
+  const updatedAt = new Date()
+  await db.items.update(id, { ...updates, updatedAt })
   items.update(current =>
-    current.map(item => (item.id === id ? { ...item, ...updates } : item))
+    current.map(item => (item.id === id ? { ...item, ...updates, updatedAt } : item))
   )
 }
 
 export async function deleteItem(id: string) {
-  await db.items.delete(id)
+  await db.items.update(id, { deletedAt: new Date(), updatedAt: new Date() })
   items.update(current => current.filter(item => item.id !== id))
 }
 
 export function getItemsByCategory(allItems: FreezerItem[], categoryId: string) {
-  return allItems.filter(item => item.categoryId === categoryId)
+  return allItems.filter(item => item.categoryId === categoryId && item.deletedAt == null)
 }
